@@ -2,7 +2,7 @@
 
 ## 1. Tujuan Proyek
 
-Proyek ini bertujuan untuk membangun dan mendokumentasikan **pipeline deteksi ujaran kebencian pada media sosial** dengan pendekatan **Continuous Training**. Proyek ini mencakup:
+Proyek ini bertujuan untuk membangun pipeline deteksi ujaran kebencian pada media sosial dengan pendekatan **Continuous Training**. Proyek ini mencakup:
 
 1. Eksplorasi dan preprocessing dataset awal yang sudah berlabel (Kaggle) untuk pelatihan model dasar.  
 2. Akuisisi data baru secara berkala dari Reddit menggunakan mekanisme batch-based ingestion yang mensimulasikan karakteristik data streaming.  
