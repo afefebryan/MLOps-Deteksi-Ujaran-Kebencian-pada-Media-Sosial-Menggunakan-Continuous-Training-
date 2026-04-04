@@ -6,10 +6,10 @@ from labeling.labeling import run_labeling
 from datetime import datetime
 import os
 
-# === BASE DIR (IMPORTANT FIX) ===
+# BASE DIR 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# === CONFIG ===
+# CONFIG
 RAW_DIR = os.path.join(BASE_DIR, "data", "raw")
 CLEAN_DIR = os.path.join(BASE_DIR, "data", "processed")
 
@@ -20,7 +20,7 @@ os.makedirs(CLEAN_DIR, exist_ok=True)
 BASE_RAW_NAME = "reddit_raw_comments"
 BASE_CLEAN_NAME = "reddit_clean_comments"
 
-# === GENERATE VERSION + DATE ===
+# GENERATE VERSION + DATE
 date_str = datetime.now().strftime("%Y-%m-%d")
 
 def get_versioned_filename(directory, base_name, date_str):
@@ -35,14 +35,11 @@ def get_versioned_filename(directory, base_name, date_str):
         
         version += 1
 
-# === CREATE FILE PATHS ===
+# CREATE FILE PATHS
 RAW_PATH = get_versioned_filename(RAW_DIR, BASE_RAW_NAME, date_str)
 CLEAN_PATH = get_versioned_filename(CLEAN_DIR, BASE_CLEAN_NAME, date_str)
 
-# print("RAW PATH:", RAW_PATH)
-# print("CLEAN PATH:", CLEAN_PATH)
-
-# === PIPELINE ===
+# PIPELINE
 print("===== EXTRACT =====")
 run_extract(RAW_PATH)
 
