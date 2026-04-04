@@ -41,3 +41,54 @@ project/
 
 ```bash
 pip install -r requirements.txt
+```
+## 4. Menjalankan Pipeline Pengumpulan Data
+
+Pipeline ini digunakan untuk mengambil data dari Reddit, melakukan preprocessing, dan memberikan label otomatis pada data yang dikumpulkan. Seluruh proses dijalankan secara terintegrasi melalui satu file utama, yaitu `run_pipeline.py`.
+
+### 4.1 Langkah-langkah
+
+1. Masuk ke direktori source code (jika menggunakan struktur `src/`):
+
+   ```bash
+   cd src
+   ```
+
+2. Jalankan pipeline:
+
+   ```bash
+   python run_pipeline.py
+   ```
+
+### 4.2 Alur Pipeline
+
+Pipeline akan menjalankan beberapa tahap secara berurutan:
+
+| Tahap | Deskripsi |
+|-------|-----------|
+| **Extract** | Mengambil data komentar dari Reddit berdasarkan subreddit yang telah ditentukan. |
+| **Transform** | Membersihkan teks, menghapus duplikasi, filtering user, serta membuat embedding. |
+| **Load** | Memuat dataset hasil preprocessing. |
+| **Labeling** | Memberikan label otomatis (**Neutral**, **Offensive**, **Hateful**) menggunakan model zero-shot. |
+
+### 4.3 Output yang Dihasilkan
+
+Setelah pipeline dijalankan, akan dihasilkan dua jenis file:
+
+- **Raw Data** → disimpan di folder `data/raw/`
+- **Processed Data** → disimpan di folder `data/processed/`
+
+Setiap file menggunakan format penamaan:
+
+```
+<nama_file>_V<versi>_<tanggal>.csv
+```
+
+**Contoh:**
+
+```
+reddit_raw_comments_V1_2026-04-04.csv
+reddit_clean_comments_V1_2026-04-04.csv
+```
+
+Sistem ini memastikan bahwa data tidak akan tertimpa saat pipeline dijalankan berulang kali.
