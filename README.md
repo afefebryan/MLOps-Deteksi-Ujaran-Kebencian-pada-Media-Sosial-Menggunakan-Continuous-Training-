@@ -153,6 +153,6 @@ Perintah ini memungkinkan identifikasi perubahan metadata dan memastikan bahwa s
 
 ---
 
-### 5.7 Tujuan Pengunaan DVC
+### 5.6 Tujuan Pengunaan DVC
 
 DVC memungkinkan pelacakan versi dataset secara efisien tanpa membebani repository Git. Dengan pendekatan ini, setiap perubahan data dapat ditelusuri, direproduksi, dan dibandingkan antar versi, sehingga mendukung praktik pengembangan machine learning yang lebih terstruktur dan reproducible.
