@@ -92,3 +92,67 @@ reddit_clean_comments_V1_2026-04-04.csv
 ```
 
 Sistem ini memastikan bahwa data tidak akan tertimpa saat pipeline dijalankan berulang kali.
+
+## 5. Data Versioning dengan DVC
+
+### 5.1 Inisialisasi DVC
+
+DVC diinisialisasi pada repository untuk memungkinkan pelacakan data secara terpisah dari Git:
+
+```
+dvc init
+```
+
+---
+
+### 5.2 Tracking Dataset Awal
+
+Dataset awal dilacak menggunakan DVC agar tidak disimpan langsung di Git:
+
+```
+dvc add data/raw/dataset.csv
+```
+
+File `.dvc` yang dihasilkan akan di-commit ke Git, sementara file dataset asli akan diabaikan oleh Git melalui `.gitignore`.
+
+---
+
+### 5.3 Simulasi Continual Learning
+
+Dataset diperbarui dengan menjalankan proses ingestion untuk mensimulasikan penambahan data baru:
+
+```
+python ingest_data.py
+```
+
+Proses ini menghasilkan data tambahan yang merepresentasikan skenario continual learning.
+
+---
+
+### 5.4 Versioning Dataset
+
+Setelah dataset diperbarui, dilakukan pelacakan ulang menggunakan DVC:
+
+```
+dvc add data/raw/dataset.csv
+```
+
+Perubahan ini akan menghasilkan hash baru pada file `.dvc`, yang menandakan adanya versi dataset yang berbeda.
+
+---
+
+### 5.5 Audit dan Perbandingan Versi Data
+
+Perbedaan antara versi dataset lama dan baru dapat dianalisis menggunakan:
+
+```
+dvc diff
+```
+
+Perintah ini memungkinkan identifikasi perubahan metadata dan memastikan bahwa setiap versi dataset tercatat dengan baik.
+
+---
+
+### 5.7 Tujuan Pengunaan DVC
+
+DVC memungkinkan pelacakan versi dataset secara efisien tanpa membebani repository Git. Dengan pendekatan ini, setiap perubahan data dapat ditelusuri, direproduksi, dan dibandingkan antar versi, sehingga mendukung praktik pengembangan machine learning yang lebih terstruktur dan reproducible.
