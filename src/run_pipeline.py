@@ -2,7 +2,7 @@ from extract.ingest_data import run_extract
 from transform.preprocess import transform_data
 from load.loader import load_dataset
 from labeling.labeling import run_labeling
-
+import re
 from datetime import datetime
 import os
 
@@ -24,16 +24,20 @@ BASE_CLEAN_NAME = "reddit_clean_comments"
 date_str = datetime.now().strftime("%Y-%m-%d")
 
 def get_versioned_filename(directory, base_name, date_str):
-    version = 1
-    
-    while True:
-        filename = f"{base_name}_V{version}_{date_str}.csv"
-        full_path = os.path.join(directory, filename)
-        
-        if not os.path.exists(full_path):
-            return full_path
-        
-        version += 1
+    pattern = re.compile(rf"{base_name}_V(\d+)_\d{{4}}-\d{{2}}-\d{{2}}\.csv")
+
+    max_version = 0
+
+    for file in os.listdir(directory):
+        match = pattern.match(file)
+        if match:
+            version = int(match.group(1))
+            max_version = max(max_version, version)
+
+    new_version = max_version + 1
+
+    filename = f"{base_name}_V{new_version}_{date_str}.csv"
+    return os.path.join(directory, filename)
 
 # CREATE FILE PATHS
 RAW_PATH = get_versioned_filename(RAW_DIR, BASE_RAW_NAME, date_str)
