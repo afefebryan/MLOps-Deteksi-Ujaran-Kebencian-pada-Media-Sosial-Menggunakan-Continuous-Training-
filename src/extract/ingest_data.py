@@ -12,7 +12,7 @@ headers = {
     "User-Agent": "Mozilla/5.0 (RedditCommentScraper/1.0)"
 }
 
-SUBREDDITS = ["politics", "worldnews", "unpopularopinion"]
+SUBREDDITS = ["politics", "TrueOffMyChest", "mildlyinfuriating"]
 LIMIT_POST = 10
 MIN_WORDS = 15
 MAX_WORDS = 150

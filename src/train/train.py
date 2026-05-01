@@ -21,7 +21,7 @@ DATA_PATH        = "../../data/processed/tdavidson_hate_speech_v0_clean.csv"
 DATASET_NAME     = "tdavidson_hate_speech_v0_clean"
 DATASET_VERSION  = "v0"
 EXPERIMENT_NAME  = "hate-speech-classification"
-REGISTRY_NAME    = "HateSpeechClassifier"
+REGISTRY_NAME    = "HateSpeechClassifierV1"
 BEST_METRIC      = "f1_macro"
 
 TFIDF_PARAMS = dict(ngram_range=(1, 2), min_df=2, max_df=0.9, sublinear_tf=True)
@@ -53,10 +53,18 @@ def compute_metrics(y_true, y_pred):
     }
 
 
+class ColumnExtractor:
+    def fit(self, X, y=None): return self
+    def transform(self, X):
+        if hasattr(X, 'columns'): return X['clean_tweet']
+        return X
+
+
 def run_experiment(run_name: str, tfidf_params: dict, clf_name: str, clf):
     pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(**tfidf_params)),
-        ("clf",   clf)
+        ("extractor", ColumnExtractor()),
+        ("tfidf",     TfidfVectorizer(**tfidf_params)),
+        ("clf",       clf)
     ])
 
     with mlflow.start_run(run_name=run_name) as run:
@@ -121,12 +129,15 @@ def run_experiment(run_name: str, tfidf_params: dict, clf_name: str, clf):
             f.write(report)
         mlflow.log_artifact(report_path, artifact_path="reports")
 
-        signature = infer_signature(X_train, preds)
+        # Artifact: model — diberi nama sesuai run agar mudah dibedakan di UI
+        # signature dari DataFrame agar pyfunc.load_model bisa dipakai saat inferensi
+        input_example = X_test.head(3).to_frame().rename(columns={"clean_tweet": "clean_tweet"})
+        signature     = infer_signature(input_example, preds[:3])
         mlflow.sklearn.log_model(
             sk_model      = pipeline,
             artifact_path = run_name,
             signature     = signature,
-            input_example = X_test.head(3).to_frame()
+            input_example = input_example
         )
 
         run_id = run.info.run_id
@@ -197,9 +208,9 @@ TUNING_GRIDS = {
         dict(C=1.0,  solver="saga",  max_iter=1000, class_weight="balanced", penalty="l1"),
     ],
     "LinearSVC": [
-        dict(C=0.1, class_weight="balanced", max_iter=3000),
-        dict(C=0.5, class_weight="balanced", max_iter=3000),
-        dict(C=1.0, class_weight="balanced", max_iter=3000),
+        dict(C=0.1, class_weight="balanced", max_iter=2000),
+        dict(C=0.55, class_weight="balanced", max_iter=500),
+        dict(C=1.0, class_weight="balanced", max_iter=1000),
         dict(C=2.0, class_weight="balanced", max_iter=3000),
         dict(C=5.0, class_weight="balanced", max_iter=3000),
     ],
@@ -270,6 +281,7 @@ print(f"  Accuracy   : {best_overall['accuracy']:.4f}")
 
 print("\nMendaftarkan model ke MLflow Model Registry ...")
 
+# model_uri menggunakan run_name sebagai artifact_path (sesuai log_model di atas)
 model_uri  = f"runs:/{best_overall['run_id']}/{best_overall['run_name']}"
 registered = mlflow.register_model(model_uri=model_uri, name=REGISTRY_NAME)
 

@@ -1,5 +1,5 @@
 outs:
-- md5: f50ce47768c8e03b7ceb187d271788b6
-  size: 3446496
+- md5: 044e61db974c8fa3ef7b34d1f57ab5de
+  size: 2915436
   hash: md5
   path: tdavidson_hate_speech_v0_clean.csv
