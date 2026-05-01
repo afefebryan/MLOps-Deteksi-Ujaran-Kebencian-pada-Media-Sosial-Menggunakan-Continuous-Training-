@@ -156,3 +156,56 @@ Perintah ini memungkinkan identifikasi perubahan metadata dan memastikan bahwa s
 ### 5.6 Tujuan Pengunaan DVC
 
 DVC memungkinkan pelacakan versi dataset secara efisien tanpa membebani repository Git. Dengan pendekatan ini, setiap perubahan data dapat ditelusuri, direproduksi, dan dibandingkan antar versi, sehingga mendukung praktik pengembangan machine learning yang lebih terstruktur dan reproducible.
+
+## 6. Model Aktif untuk Inferensi
+
+Model yang saat ini digunakan untuk proses inferensi adalah model terbaik hasil eksperimen yang dikelola menggunakan MLflow Model Registry.
+
+---
+
+### 6.1 Model Terpilih
+
+| Atribut  | Detail                             |
+|----------|------------------------------------|
+| Model    | LinearSVC                          |
+| Run      | Phase2_LinearSVC_run02             |
+| Dataset  | tdavidson_hate_speech_v0_clean (v0) |
+| F1 Macro | 0.9200                             |
+| Accuracy | 0.9521                             |
+
+Model ini dipilih sebagai model aktif karena memiliki performa terbaik dibandingkan seluruh eksperimen yang dilakukan, khususnya pada metrik **F1 Macro** yang menjadi fokus utama dalam menangani ketidakseimbangan kelas pada kasus klasifikasi ujaran kebencian.
+
+---
+
+### 6.2 Alasan Pemilihan Model
+
+Pemilihan model didasarkan pada hasil evaluasi berikut:
+
+```
+              run_name  accuracy  f1_macro  f1_weighted
+Phase2_LinearSVC_run02  0.952147  0.920005     0.953421
+      Phase1_LinearSVM  0.952007  0.919937     0.953329
+        Phase1_SGD_SVM  0.950463  0.919511     0.952403
+Phase2_LinearSVC_run03  0.950182  0.915354     0.951135
+             Phase1_LR  0.944850  0.910943     0.947156
+Phase2_LinearSVC_run04  0.948077  0.910371     0.948681
+             Phase1_RF  0.949481  0.908655     0.948898
+Phase2_LinearSVC_run01  0.943026  0.908431     0.945521
+         Phase1_SGD_LR  0.940219  0.904554     0.943003
+Phase2_LinearSVC_run05  0.944289  0.902129     0.944460
+```
+
+`Phase2_LinearSVC_run02` menempati posisi tertinggi pada metrik **F1 Macro**, yang menunjukkan performa paling baik dalam menangani distribusi kelas yang tidak seimbang. Nilai **accuracy** yang tinggi juga mengonfirmasi bahwa model tetap stabil secara keseluruhan.
+
+---
+
+### 6.3 Status Model
+
+Model telah didaftarkan ke dalam MLflow Model Registry dengan stage berikut:
+
+```
+Staging
+```
+
+Stage ini menunjukkan bahwa model telah siap digunakan dalam proses inferensi dan dapat dipromosikan ke tahap **Production** setelah melalui validasi lebih lanjut.
+
