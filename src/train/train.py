@@ -17,7 +17,7 @@ from sklearn.metrics import (
 )
 
 # KONFIGURASI
-DATA_PATH        = "../../data/processed/tdavidson_hate_speech_v0_clean.csv"
+DATA_PATH = "data/processed/tdavidson_hate_speech_v0_clean.csv"
 DATASET_NAME     = "tdavidson_hate_speech_v0_clean"
 DATASET_VERSION  = "v0"
 EXPERIMENT_NAME  = "hate-speech-classification"
