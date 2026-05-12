@@ -7,6 +7,7 @@ Jalankan: python evaluate.py
 """
 
 import sys
+import os
 import yaml
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -14,7 +15,9 @@ from mlflow.tracking import MlflowClient
 # ---------------------------------------------------------------
 # LOAD KONFIGURASI
 # ---------------------------------------------------------------
-with open("params.yaml", "r") as f:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(BASE_DIR, "params.yaml"), "r") as f:
     params = yaml.safe_load(f)
 
 F1_THRESHOLD  = params["evaluation"]["f1_macro_threshold"]
@@ -22,7 +25,7 @@ ACC_THRESHOLD = params["evaluation"]["accuracy_threshold"]
 EXPERIMENT    = params["experiment"]["name"]
 REGISTRY_NAME = params["experiment"]["registry_name"]
 
-mlflow.set_tracking_uri("mlruns")
+mlflow.set_tracking_uri(os.path.join(BASE_DIR, "src", "train", "mlruns"))
 client = MlflowClient()
 
 # ---------------------------------------------------------------
