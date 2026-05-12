@@ -27,7 +27,8 @@ BEST_METRIC      = "f1_macro"
 TFIDF_PARAMS = dict(ngram_range=(1, 2), min_df=2, max_df=0.9, sublinear_tf=True)
 
 # SETUP MLFLOW
-mlflow.set_tracking_uri("mlruns")
+import os
+mlflow.set_tracking_uri(os.path.join(os.path.dirname(__file__), "mlruns"))
 mlflow.set_experiment(EXPERIMENT_NAME)
 
 # LOAD & SPLIT DATA
