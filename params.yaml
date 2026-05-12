@@ -1,0 +1,11 @@
+evaluation:
+  f1_macro_threshold: 0.85
+  accuracy_threshold: 0.90
+
+data:
+  test_size: 0.3
+  random_state: 42
+
+experiment:
+  name: "hate-speech-classification"
+  registry_name: "HateSpeechClassifierV1"
