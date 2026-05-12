@@ -32,10 +32,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Pull data via DVC
-        env:
-          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-        run: dvc pull
+      - name: Cache DVC local storage
+        uses: actions/cache@v4
+        with:
+          path: .dvc/cache
+          key: dvc-cache-${{ hashFiles('data/**/*.dvc') }}
+          restore-keys: dvc-cache-
+
+      - name: Pull data dari DVC local cache
+        run: dvc checkout
 
       - name: Run unit tests
         run: pytest tests/test_train.py -v --tb=short
@@ -61,10 +66,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Pull data via DVC
-        env:
-          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
-        run: dvc pull
+      - name: Cache DVC local storage
+        uses: actions/cache@v4
+        with:
+          path: .dvc/cache
+          key: dvc-cache-${{ hashFiles('data/**/*.dvc') }}
+          restore-keys: dvc-cache-
+
+      - name: Pull data dari DVC local cache
+        run: dvc checkout
 
       - name: Run training
         run: python src/train/train.py
@@ -78,7 +88,7 @@ jobs:
 
   # ─────────────────────────────────────────
   # JOB 3 — MODEL EVALUATION & VALIDATION
-  # JOB 4 — AUTO REGISTRY UPDATE (di dalam job ini)
+  # JOB 4 — AUTO REGISTRY UPDATE
   # ─────────────────────────────────────────
   evaluate:
     name: "Stage 3+4 — Evaluation & Registry"
@@ -107,7 +117,6 @@ jobs:
       - name: Run evaluation & auto-register
         working-directory: src/train
         run: python ../../evaluate.py
-        # evaluate.py exit code 1 jika gagal threshold → pipeline berhenti otomatis
 
       - name: Notify result
         if: success()
