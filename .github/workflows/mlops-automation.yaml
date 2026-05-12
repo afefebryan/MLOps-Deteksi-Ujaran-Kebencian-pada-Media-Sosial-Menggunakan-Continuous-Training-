@@ -89,8 +89,7 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────
-  # JOB 3 — MODEL EVALUATION & VALIDATION
-  # JOB 4 — AUTO REGISTRY UPDATE
+  # JOB 3+4 — EVALUATION & REGISTRY
   # ─────────────────────────────────────────
   evaluate:
     name: "Stage 3+4 — Evaluation & Registry"
