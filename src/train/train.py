@@ -153,9 +153,14 @@ print("PHASE 1 - Baseline Experiments")
 print("=" * 60)
 
 baseline_configs = [
+    # ("Phase1_LR",
+    #  "LogisticRegression",
+    #  LogisticRegression(C=1.0, max_iter=1000, class_weight="balanced")),
+    
+    # sesudah
     ("Phase1_LR",
-     "LogisticRegression",
-     LogisticRegression(C=1.0, max_iter=1000, class_weight="balanced")),
+    "LogisticRegression",
+    LogisticRegression(C=2.0, max_iter=1000, class_weight="balanced")),
 
     ("Phase1_LinearSVM",
      "LinearSVC",
