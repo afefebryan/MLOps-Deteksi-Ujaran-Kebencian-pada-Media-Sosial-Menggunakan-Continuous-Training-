@@ -17,19 +17,25 @@ from sklearn.metrics import (
 )
 
 # KONFIGURASI
-DATA_PATH = "data/processed/tdavidson_hate_speech_v0_clean.csv"
+DATA_PATH = "../../data/processed/tdavidson_hate_speech_v0_clean.csv"
 DATASET_NAME     = "tdavidson_hate_speech_v0_clean"
 DATASET_VERSION  = "v0"
 EXPERIMENT_NAME  = "hate-speech-classification"
 REGISTRY_NAME    = "HateSpeechClassifierV1"
 BEST_METRIC      = "f1_macro"
 
+
 TFIDF_PARAMS = dict(ngram_range=(1, 2), min_df=2, max_df=0.9, sublinear_tf=True)
 
 # SETUP MLFLOW
 import os
-mlflow.set_tracking_uri(os.path.join(os.path.dirname(__file__), "mlruns"))
+# mlflow.set_tracking_uri(os.path.join(os.path.dirname(__file__), "mlruns"))
+
+mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_registry_uri("http://localhost:5000")
 mlflow.set_experiment(EXPERIMENT_NAME)
+
+
 
 # LOAD & SPLIT DATA
 print("Memuat dataset ...")
@@ -153,14 +159,14 @@ print("PHASE 1 - Baseline Experiments")
 print("=" * 60)
 
 baseline_configs = [
-    # ("Phase1_LR",
-    #  "LogisticRegression",
-    #  LogisticRegression(C=1.0, max_iter=1000, class_weight="balanced")),
-    
-    # sesudah
     ("Phase1_LR",
-    "LogisticRegression",
-    LogisticRegression(C=2.0, max_iter=1000, class_weight="balanced")),
+     "LogisticRegression",
+     LogisticRegression(C=1.0, max_iter=1000, class_weight="balanced")),
+    
+    # # sesudah
+    # ("Phase1_LR",
+    # "LogisticRegression",
+    # LogisticRegression(C=2.0, max_iter=1000, class_weight="balanced")),
 
     ("Phase1_LinearSVM",
      "LinearSVC",

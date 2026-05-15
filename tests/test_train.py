@@ -1,9 +1,3 @@
-"""
-tests/test_train.py
-Unit tests untuk memverifikasi integritas pipeline sebelum training.
-Jalankan: pytest tests/test_train.py -v
-"""
-
 import pytest
 import pandas as pd
 import numpy as np
@@ -20,9 +14,7 @@ from sklearn.metrics import f1_score, accuracy_score
 
 DATA_PATH = "data/processed/tdavidson_hate_speech_v0_clean.csv"
 
-# ---------------------------------------------------------------
 # FIXTURE
-# ---------------------------------------------------------------
 @pytest.fixture(scope="module")
 def dataset():
     df = pd.read_csv(DATA_PATH)
@@ -48,9 +40,7 @@ def trained_pipeline(split_data):
     return pipeline, X_test, y_test
 
 
-# ---------------------------------------------------------------
 # TEST 1 — Dataset
-# ---------------------------------------------------------------
 class TestDataset:
     def test_file_exists(self):
         assert os.path.exists(DATA_PATH), f"File tidak ditemukan: {DATA_PATH}"
@@ -74,9 +64,7 @@ class TestDataset:
         assert dataset["clean_tweet"].dtype == object, "clean_tweet bukan tipe string"
 
 
-# ---------------------------------------------------------------
 # TEST 2 — Data Split
-# ---------------------------------------------------------------
 class TestDataSplit:
     def test_split_ratio(self, split_data):
         X_train, X_test, y_train, y_test = split_data
@@ -96,9 +84,7 @@ class TestDataSplit:
         assert abs(train_ratio - test_ratio) < 0.05, "Stratifikasi label tidak seimbang"
 
 
-# ---------------------------------------------------------------
 # TEST 3 — Pipeline
-# ---------------------------------------------------------------
 class TestPipeline:
     def test_pipeline_fit(self, trained_pipeline):
         pipeline, X_test, y_test = trained_pipeline
@@ -121,9 +107,7 @@ class TestPipeline:
         assert not np.any(np.isnan(preds.astype(float))), "Ada NaN di output prediksi"
 
 
-# ---------------------------------------------------------------
 # TEST 4 — Metrik
-# ---------------------------------------------------------------
 class TestMetrics:
     def test_f1_macro_above_threshold(self, trained_pipeline):
         pipeline, X_test, y_test = trained_pipeline

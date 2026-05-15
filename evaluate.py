@@ -1,20 +1,10 @@
-"""
-evaluate.py
-Membandingkan metrik model terbaru di MLflow dengan threshold di params.yaml.
-Exit code 0 = lolos, Exit code 1 = gagal (GitHub Actions akan stop pipeline).
-
-Jalankan: python evaluate.py
-"""
-
 import sys
 import os
 import yaml
 import mlflow
 from mlflow.tracking import MlflowClient
 
-# ---------------------------------------------------------------
 # LOAD KONFIGURASI
-# ---------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 with open(os.path.join(BASE_DIR, "params.yaml"), "r") as f:
@@ -28,9 +18,7 @@ REGISTRY_NAME = params["experiment"]["registry_name"]
 mlflow.set_tracking_uri(os.path.join(BASE_DIR, "src", "train", "mlruns"))
 client = MlflowClient()
 
-# ---------------------------------------------------------------
 # AMBIL RUN TERBARU DARI EXPERIMENT
-# ---------------------------------------------------------------
 print("=" * 60)
 print("MODEL EVALUATION & VALIDATION")
 print("=" * 60)
@@ -63,9 +51,7 @@ print(f"Classifier     : {clf_name}")
 print(f"f1_macro       : {f1_macro:.4f}  (threshold >= {F1_THRESHOLD})")
 print(f"accuracy       : {accuracy:.4f}  (threshold >= {ACC_THRESHOLD})")
 
-# ---------------------------------------------------------------
 # VALIDASI THRESHOLD
-# ---------------------------------------------------------------
 print("\n" + "=" * 60)
 print("HASIL VALIDASI")
 print("=" * 60)
@@ -84,9 +70,7 @@ else:
     print(f"  [FAIL] accuracy  : {accuracy:.4f} < {ACC_THRESHOLD}")
     passed = False
 
-# ---------------------------------------------------------------
 # REGISTER KE STAGING JIKA LOLOS
-# ---------------------------------------------------------------
 if passed:
     print("\nValidasi LOLOS — mendaftarkan model ke Staging ...")
 
