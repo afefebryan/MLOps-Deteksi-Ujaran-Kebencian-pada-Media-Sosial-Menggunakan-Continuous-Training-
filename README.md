@@ -209,3 +209,105 @@ Staging
 
 Stage ini menunjukkan bahwa model telah siap digunakan dalam proses inferensi dan dapat dipromosikan ke tahap **Production** setelah melalui validasi lebih lanjut.
 
+## 7. Menjalankan Sistem dengan Docker Compose
+
+Sistem ini terdiri dari dua layanan yang dijalankan secara bersamaan menggunakan Docker Compose:
+
+| Layanan | Deskripsi | Port |
+|---|---|---|
+| `mlflow-server` | MLflow Tracking Server + Model Registry (SQLite) | `5000` |
+| `api-service` | REST API inferensi model (FastAPI) | `8000` |
+
+---
+
+### 7.1 Prasyarat
+
+Pastikan sudah terinstall:
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/) (sudah termasuk di Docker Desktop)
+
+Verifikasi instalasi:
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+### 7.2 Jalankan Seluruh Sistem
+
+Jalankan semua layanan dengan satu perintah dari direktori root proyek:
+
+```bash
+docker compose up -d
+```
+
+Docker akan secara otomatis:
+1. Build image `api-service` dari `Dockerfile`
+2. Pull image `mlflow-server`
+3. Membuat network `mlops-network`
+4. Membuat volume persisten `mlflow-db` dan `mlflow-artifacts`
+5. Menjalankan `mlflow-server` terlebih dahulu, lalu `api-service` setelah server siap
+
+---
+
+### 7.3 Verifikasi Status Layanan
+
+Cek status seluruh container yang berjalan:
+
+```bash
+docker compose ps
+```
+
+Output yang diharapkan:
+```
+NAME             IMAGE           STATUS                   PORTS
+mlflow-server    mlflow/mlflow   Up (healthy)             0.0.0.0:5000->5000/tcp
+api-service      api-service     Up (healthy)             0.0.0.0:8000->8000/tcp
+```
+
+---
+
+### 7.4 Akses Layanan
+
+| Layanan | URL |
+|---|---|
+| MLflow UI | http://localhost:5000 |
+| API Health Check | http://localhost:8000/health |
+| API Dokumentasi (Swagger) | http://localhost:8000/docs |
+
+---
+
+### 7.5 Uji Inferensi
+
+Kirim request prediksi ke API menggunakan `curl`:
+
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"texts": ["i hate all of you", "have a great day everyone"]}'
+```
+
+Contoh response:
+```json
+{
+  "predictions": [
+    {"text": "i hate all of you", "prediction": 1, "label": "harmful"},
+    {"text": "have a great day everyone", "prediction": 0, "label": "neutral"}
+  ],
+  "model_version": "2",
+  "stage": "Production"
+}
+```
+
+---
+
+### 7.6 Menghentikan Sistem
+
+```bash
+# hentikan semua container (data tetap tersimpan di volume)
+docker compose down
+
+# hentikan dan hapus semua data volume (reset total)
+docker compose down -v
+```
