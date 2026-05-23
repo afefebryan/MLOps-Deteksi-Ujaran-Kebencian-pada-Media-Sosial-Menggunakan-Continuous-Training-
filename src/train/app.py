@@ -11,9 +11,7 @@ from pydantic import BaseModel
 from typing import List
 import uvicorn
 
-# ---------------------------------------------------------------
 # KONFIGURASI
-# ---------------------------------------------------------------
 REGISTRY_NAME = os.getenv("REGISTRY_NAME", "HateSpeechClassifierV1")
 MLFLOW_URI    = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow-server:5000")
 
@@ -26,13 +24,10 @@ app    = FastAPI(
     version     = "1.0.0"
 )
 
-# model dimuat saat startup
 model       = None
 model_version = None
 
-# ---------------------------------------------------------------
 # SCHEMA
-# ---------------------------------------------------------------
 class PredictRequest(BaseModel):
     texts: List[str]
 
@@ -41,9 +36,7 @@ class PredictResponse(BaseModel):
     model_version: str
     stage: str
 
-# ---------------------------------------------------------------
 # STARTUP — load model dari Production
-# ---------------------------------------------------------------
 @app.on_event("startup")
 def load_model():
     global model, model_version
@@ -64,9 +57,7 @@ def load_model():
         f"Jalankan train.py terlebih dahulu."
     )
 
-# ---------------------------------------------------------------
 # ENDPOINTS
-# ---------------------------------------------------------------
 @app.get("/health")
 def health():
     return {

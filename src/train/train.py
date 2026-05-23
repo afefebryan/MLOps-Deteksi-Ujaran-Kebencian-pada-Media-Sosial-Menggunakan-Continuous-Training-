@@ -312,7 +312,7 @@ client.update_model_version(
 client.transition_model_version_stage(
     name                      = REGISTRY_NAME,
     version                   = registered.version,
-    stage                     = "Staging",
+    stage                     = "Production",
     archive_existing_versions = True
 )
 

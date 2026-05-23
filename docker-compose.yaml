@@ -1,19 +1,15 @@
 version: "3.9"
 
-# NETWORKS
 networks:
   mlops-network:
     driver: bridge
 
-# VOLUMES
 volumes:
-  mlflow-db:        
-  mlflow-artifacts: 
+  mlflow-db:
+  mlflow-artifacts:
 
-# SERVICES
 services:
-  
-  # ── 1. MLflow Tracking Server ──────────────────────────────
+
   mlflow-server:
     image: ghcr.io/mlflow/mlflow:v3.1.0
     container_name: mlflow-server
@@ -22,27 +18,25 @@ services:
       - "5000:5000"
     volumes:
       - mlflow-db:/mlflow/db
-      - mlflow-artifacts:/mlflow/artifacts  
+      - mlflow-artifacts:/mlflow/artifacts
     command: >
       mlflow server
       --backend-store-uri sqlite:///mlflow/db/mlflow.db
       --default-artifact-root mlflow-artifacts:/
+      --artifacts-destination /mlflow/artifacts
       --serve-artifacts
       --host 0.0.0.0
       --port 5000
     networks:
       - mlops-network
-      
-      
-  # ── 2. API Inferensi ────────────────────────────────────────
   api-service:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: api-service
+      dockerfile: Dockerfile     # ← tambah ini
+    image: hate-speech-model
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "5001-5003:8000"
     environment:
       - MLFLOW_TRACKING_URI=http://mlflow-server:5000
       - REGISTRY_NAME=HateSpeechClassifierV1
@@ -50,6 +44,18 @@ services:
       - mlflow-server
     networks:
       - mlops-network
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 15s
