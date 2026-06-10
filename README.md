@@ -1,16 +1,33 @@
 # Sistem Deteksi Ujaran Kebencian pada Media Sosial dengan Continuous Training pada Data Dinamis
 
-## 1. Tujuan Proyek
+## 1. Overview Proyek
 
+### 1.1 Tujuan Proyek
 Proyek ini bertujuan untuk membangun pipeline deteksi ujaran kebencian pada media sosial dengan pendekatan **Continuous Training**. Proyek ini mencakup:
 
 1. Eksplorasi dan preprocessing dataset awal yang sudah berlabel (Kaggle) untuk pelatihan model dasar.  
 2. Akuisisi data baru secara berkala dari Reddit menggunakan mekanisme batch-based ingestion yang mensimulasikan karakteristik data streaming.  
-3. Penerapan mekanisme retraining otomatis berbasis trigger, seperti penurunan F1-score atau perubahan distribusi data (KL Divergence).  
+3. Penerapan mekanisme retraining otomatis berbasis trigger, seperti penurunan F1-score 
 4. Pengelolaan versi model dan metrik performa menggunakan MLflow, untuk memastikan model tetap adaptif terhadap perubahan pola bahasa di media sosial.  
 5. Penyediaan endpoint inferensi sederhana (FastAPI) untuk memprediksi komentar baru secara terukur.  
 
 Dengan demikian, proyek ini fokus pada **adaptasi model terhadap data dinamis** sekaligus menyediakan pipeline yang jelas dan dapat direplikasi.
+
+
+### 1.2 Dataset yang Digunakan
+
+Model pada proyek ini dilatih menggunakan dataset **tdavidson_hate_speech_v0_clean_train**, yang merupakan hasil pembersihan dari dataset hate speech milik Davidson et al. Dataset ini berisi kumpulan teks media sosial berbahasa Inggris yang telah diberi label untuk tugas klasifikasi ujaran kebencian.
+
+Dataset digunakan sebagai data awal (baseline dataset) untuk membangun model pertama sebelum sistem menerima data baru dari proses ingestion Reddit. Selama proses continuous training, data baru yang diperoleh akan digabungkan dengan dataset yang sudah ada untuk melakukan retraining dan memperbarui model secara berkala.
+
+Kolom utama yang digunakan dalam proses pelatihan adalah:
+
+| Kolom | Deskripsi                                        |
+| ----- | ------------------------------------------------ |
+| text  | Teks komentar atau unggahan yang akan dianalisis |
+| label | Label klasifikasi (harmful atau neutral)         |
+
+Dataset ini disimpan dan dikelola menggunakan DVC sehingga setiap perubahan data dapat dilacak dan direproduksi selama proses pengembangan maupun retraining model.
 
 ---
 ## 2. Struktur Direktori Proyek
@@ -376,5 +393,49 @@ for port in 5001 5002 5003; do
     -d '{"texts": ["I hate you"]}' | python3 -m json.tool
 done
 ```
+
+---
+
+## 9. Retraining Trigger dan Ambang Batas Metrik
+
+Sistem mendukung retraining otomatis melalui dua mekanisme, yaitu berdasarkan penurunan performa model (performance-based trigger) dan jadwal berkala (schedule-based trigger).
+
+### 9.1 Performance-Based Trigger
+
+Retraining akan dipicu ketika performa model yang dimonitor melalui Grafana berada di bawah ambang batas yang telah ditentukan. Alert Rule dibuat melalui Grafana UI dan dikonfigurasi untuk mengirimkan Webhook ke GitHub Actions menggunakan `repository_dispatch`.
+
+Contoh ambang batas yang digunakan:
+
+| Metrik   | Threshold |
+| -------- | --------- |
+| F1 Macro | < 0.75    |
+
+Jika nilai metrik turun di bawah threshold, Grafana akan mengirimkan notifikasi Webhook yang memicu pipeline retraining secara otomatis.
+
+### 9.2 Schedule-Based Trigger
+
+Selain berdasarkan performa, retraining juga dijalankan secara berkala menggunakan GitHub Actions Scheduler.
+
+Konfigurasi yang digunakan:
+
+```yaml
+schedule:
+  - cron: '0 0 * * 5'
+```
+
+Konfigurasi tersebut menjalankan pipeline setiap hari Jumat pukul 00:00 UTC. Mekanisme ini memastikan model tetap diperbarui secara rutin apabila terdapat data baru yang telah ditambahkan ke DVC.
+
+### 9.3 Validasi Model Setelah Retraining
+
+Setelah proses retraining selesai, model baru akan dievaluasi secara otomatis menggunakan metrik yang tersimpan di MLflow.
+
+Model hanya akan didaftarkan ke Model Registry apabila memenuhi seluruh ambang batas berikut:
+
+| Metrik   | Threshold Minimum |
+| -------- | ----------------- |
+| Accuracy | ≥ 0.85            |
+| F1 Macro | ≥ 0.80            |
+
+Jika seluruh syarat terpenuhi, model akan otomatis didaftarkan ke MLflow Model Registry dan dipindahkan ke stage **Staging**. Jika tidak memenuhi threshold, model akan ditolak dan tidak dipromosikan.
 
 ---

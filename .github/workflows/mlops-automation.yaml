@@ -6,6 +6,9 @@ on:
   repository_dispatch:
     types: [retrain_trigger]
 
+  # schedule:
+  #   - cron: '0 0 * * 5' 
+
 jobs:
   # JOB 1 — AUTOMATED TESTING
   test:
