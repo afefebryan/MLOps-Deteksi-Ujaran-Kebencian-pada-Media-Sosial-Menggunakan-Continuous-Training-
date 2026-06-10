@@ -80,7 +80,7 @@ jobs:
         run: dvc checkout
 
       - name: Run training
-        run: python src/train/train.py
+        run: python src/train/retrain.py
 
       - name: Upload mlruns artifact
         uses: actions/upload-artifact@v4
