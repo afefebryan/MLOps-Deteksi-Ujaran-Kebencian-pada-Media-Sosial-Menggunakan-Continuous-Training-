@@ -17,8 +17,9 @@ REGISTRY_NAME = params["experiment"]["registry_name"]
 
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-MLRUNS_PATH = os.path.join(BASE_DIR, "mlruns")
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))  # ← abspath dulu
+TRAIN_DIR   = os.path.abspath(os.path.join(BASE_DIR, "src/train"))
+MLRUNS_PATH = os.path.join(TRAIN_DIR, "mlruns")
 
 mlflow.set_tracking_uri(f"file:{MLRUNS_PATH}")
 client = MlflowClient()
