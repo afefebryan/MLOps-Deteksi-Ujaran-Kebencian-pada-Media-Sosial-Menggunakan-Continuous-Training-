@@ -10,6 +10,7 @@ volumes:
   prometheus-data:
   grafana-data:
   minio-data:
+  streamlit-data:
 
 services:
 
@@ -194,5 +195,23 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data
+    networks:
+      - mlops-network
+
+  streamlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: streamlit-app
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api-service-1:8000
+      - DB_PATH=/data/history.db
+    volumes:
+      - streamlit-data:/data
+    depends_on:
+      - api-service-1
     networks:
       - mlops-network
