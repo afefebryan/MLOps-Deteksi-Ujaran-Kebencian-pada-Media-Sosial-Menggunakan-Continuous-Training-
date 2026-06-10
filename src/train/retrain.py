@@ -33,7 +33,8 @@ TFIDF_PARAMS = dict(
 # =========================
 # MLflow SAFE MODE (CI)
 # =========================
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "file:./mlruns"))
+os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment(EXPERIMENT_NAME)
 
 # =========================
