@@ -80,9 +80,10 @@ def run_model(name, model):
 
         mlflow.log_metrics(metrics)
         mlflow.log_param("model", name)
+        mlflow.set_tag("model_type", name)          
+        mlflow.sklearn.log_model(pipeline, "model") 
 
         print(f"{name} -> f1_macro={metrics['f1_macro']:.4f}")
-
         return metrics
 
 # =========================

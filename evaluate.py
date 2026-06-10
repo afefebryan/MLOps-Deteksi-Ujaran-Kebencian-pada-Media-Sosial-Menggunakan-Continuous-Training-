@@ -80,7 +80,7 @@ else:
 if passed:
     print("\nValidasi LOLOS — mendaftarkan model ke Staging ...")
 
-    artifact_path = run_name
+    artifact_path = "model" 
     model_uri     = f"runs:/{run_id}/{artifact_path}"
 
     registered = mlflow.register_model(model_uri=model_uri, name=REGISTRY_NAME)
