@@ -15,8 +15,12 @@ ACC_THRESHOLD = params["evaluation"]["accuracy_threshold"]
 EXPERIMENT    = params["experiment"]["name"]
 REGISTRY_NAME = params["experiment"]["registry_name"]
 
-os.environ["MLFLOW_TRACKING_URI"] = "file:./mlruns"
-mlflow.set_tracking_uri("file:./mlruns")
+os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MLRUNS_PATH = os.path.join(BASE_DIR, "mlruns")
+
+mlflow.set_tracking_uri(f"file:{MLRUNS_PATH}")
 client = MlflowClient()
 
 # AMBIL RUN TERBARU DARI EXPERIMENT
