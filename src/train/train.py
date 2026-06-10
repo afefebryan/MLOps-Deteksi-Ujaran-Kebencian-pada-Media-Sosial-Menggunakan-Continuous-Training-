@@ -35,7 +35,10 @@ mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_registry_uri("http://localhost:5000")
 mlflow.set_experiment(EXPERIMENT_NAME)
 
-
+os.environ["AWS_ACCESS_KEY_ID"] = "minioadmin"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "minioadmin"
+os.environ["MLFLOW_S3_ENDPOINT_URL"] = "http://localhost:9000"
+os.environ["AWS_EC2_METADATA_DISABLED"] = "true"
 
 # LOAD & SPLIT DATA
 print("Memuat dataset ...")

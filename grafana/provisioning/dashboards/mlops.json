@@ -1,0 +1,129 @@
+{
+  "title": "MLOps — Hate Speech Detection",
+  "uid": "mlops-hate-speech",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "5s",
+  "panels": [
+    {
+    "id": 1,
+    "title": "Throughput — Request per Second",
+    "type": "timeseries",
+    "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+    "targets": [{
+        "expr": "sum by(method, handler) (rate(http_requests_total{handler!=\"/metrics\"}[1m]))",
+        "legendFormat": "{{method}} {{handler}}"
+    }]
+    },
+    {
+      "id": 2,
+      "title": "Latensi Inferensi (p50 / p95 / p99)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by(le) (rate(hate_speech_inference_latency_seconds_bucket[1m])))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(hate_speech_inference_latency_seconds_bucket[1m])))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(hate_speech_inference_latency_seconds_bucket[1m])))",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Total Prediksi per Label",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [{
+        "expr": "sum by(label) (rate(hate_speech_predictions_total[1m]))",
+        "legendFormat": "{{label}}"
+      }]
+    },
+    {
+      "id": 4,
+      "title": "Distribusi Label (Potensi Data Drift)",
+      "type": "piechart",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [{
+        "expr": "sum by(label) (hate_speech_predictions_total)",
+        "legendFormat": "{{label}}"
+      }]
+    },
+    {
+      "id": 5,
+      "title": "Panjang Input Teks (p50 / p95)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by(le) (rate(hate_speech_input_length_bucket[1m])))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(hate_speech_input_length_bucket[1m])))",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "HTTP Error Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [{
+        "expr": "sum by(status) (rate(http_requests_total{status=~\"4..|5..\"}[1m]))",
+        "legendFormat": "{{status}}"
+      }]
+    },
+    {
+      "id": 7,
+      "title": "Versi Model Aktif",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 24},
+      "targets": [{
+        "expr": "max(hate_speech_model_version)",
+        "legendFormat": "version"
+      }]
+    },
+    {
+      "id": 8,
+      "title": "Total Request (semua replica)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 24},
+      "targets": [{
+        "expr": "sum(http_requests_total)",
+        "legendFormat": "total"
+      }]
+    },
+    {
+    "id": 9,
+    "title": "Distribusi Trafik per Replica (Task 5)",
+    "type": "timeseries",
+    "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28},
+    "targets": [{
+        "expr": "sum by(instance) (rate(http_requests_total{handler=\"/predict\"}[1m]))",
+        "legendFormat": "{{instance}}"
+    }]
+    },
+    {
+    "id": 10,
+    "title": "Total Request per Replica",
+    "type": "bargauge",
+    "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28},
+    "options": {
+        "orientation": "horizontal"
+    },
+    "targets": [{
+        "expr": "sum by(instance) (increase(http_requests_total{handler=\"/predict\"}[5m]))",
+        "legendFormat": "{{instance}}"
+    }]
+    }
+  ]
+
+}

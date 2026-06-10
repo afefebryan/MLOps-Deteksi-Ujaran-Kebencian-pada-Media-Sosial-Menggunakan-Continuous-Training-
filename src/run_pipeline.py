@@ -4,6 +4,7 @@ from load.loader import load_dataset
 from labeling.labeling import run_labeling
 import re
 from datetime import datetime
+import subprocess
 import os
 
 # BASE DIR 
@@ -60,3 +61,10 @@ df.to_csv(CLEAN_PATH, index=False)
 
 print(f"\nSaved RAW  -> {RAW_PATH}")
 print(f"Saved CLEAN -> {CLEAN_PATH}")
+
+print("===== DVC ADD =====")
+subprocess.run(["dvc", "add", "data/raw"], check=True)
+subprocess.run(["dvc", "add", "data/processed"], check=True)
+
+print("===== DVC PUSH =====")
+subprocess.run(["dvc", "push"], check=True)

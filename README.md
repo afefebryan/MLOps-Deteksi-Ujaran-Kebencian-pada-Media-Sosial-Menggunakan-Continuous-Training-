@@ -311,3 +311,70 @@ docker compose down
 # hentikan dan hapus semua data volume (reset total)
 docker compose down -v
 ```
+
+## 8. Mengakses Endpoint API
+
+API berjalan di tiga replica pada port `5001`, `5002`, dan `5003`. Setiap replica dapat diakses langsung.
+
+### 8.1 Daftar Endpoint
+
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| `GET` | `/health` | Status API dan model yang dimuat |
+| `POST` | `/predict` | Prediksi teks |
+| `GET` | `/model/info` | Informasi versi model di registry |
+
+---
+
+### 8.2 Cek Status API
+
+```bash
+curl http://localhost:5001/health
+```
+
+Contoh respons:
+```json
+{
+  "status": "ok",
+  "model_loaded": true,
+  "model_version": "1",
+  "stage": "Production"
+}
+```
+
+---
+
+### 8.3 Prediksi Teks
+
+```bash
+curl -X POST http://localhost:5001/predict \
+  -H "Content-Type: application/json" \
+  -d '{"texts": ["I hate you", "have a nice day"]}'
+```
+
+Contoh respons:
+```json
+{
+  "predictions": [
+    {"text": "I hate you", "prediction": 1, "label": "harmful"},
+    {"text": "have a nice day", "prediction": 0, "label": "neutral"}
+  ],
+  "model_version": "1",
+  "stage": "Production"
+}
+```
+
+---
+
+### 8.4 Test Semua Replica Sekaligus
+
+```bash
+for port in 5001 5002 5003; do
+  echo "=== Replica port $port ==="
+  curl -s -X POST http://localhost:$port/predict \
+    -H "Content-Type: application/json" \
+    -d '{"texts": ["I hate you"]}' | python3 -m json.tool
+done
+```
+
+---

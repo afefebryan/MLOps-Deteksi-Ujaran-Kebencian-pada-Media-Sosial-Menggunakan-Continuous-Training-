@@ -9,7 +9,7 @@ from tqdm import tqdm
 BASE_URL = "https://api.reddit.com"
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (RedditCommentScraper/1.0)"
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/136.0 Safari/537.36"
 }
 
 SUBREDDITS = ["politics", "TrueOffMyChest", "mildlyinfuriating"]
@@ -54,7 +54,7 @@ def get_posts(subreddit):
     posts = []
 
     for sort in ["hot", "new", "top"]:
-        url = f"{BASE_URL}/r/{subreddit}/{sort}?limit={LIMIT_POST}"
+        url = f"{BASE_URL}/r/{subreddit}/{sort}.json?limit={LIMIT_POST}"
 
         response = safe_request(url)
         if not response:
@@ -121,7 +121,7 @@ def extract_comments(comment_list, post_meta, depth=0):
 
 
 def get_comments(post_meta):
-    url = f"{BASE_URL}/r/{post_meta['subreddit']}/comments/{post_meta['post_id']}?limit=500"
+    url = f"{BASE_URL}/r/{post_meta['subreddit']}/comments/{post_meta['post_id']}.json?limit=500"
 
     response = safe_request(url)
     if not response:
