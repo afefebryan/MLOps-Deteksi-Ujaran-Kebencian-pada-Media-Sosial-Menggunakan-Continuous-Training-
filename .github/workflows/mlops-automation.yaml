@@ -10,7 +10,7 @@
     #     - "tests/**"
     # pull_request:
     #   branches: [main]
-    workflow_dispatch:
+    workflow_dispatch: {}
 
     repository_dispatch:
       types: [retrain_trigger]
@@ -54,49 +54,49 @@
           run: pytest tests/test_train.py -v --tb=short
 
     # JOB 2 — AUTOMATED TRAINING
-      train:
-        name: "Stage 2 — Automated Training"
-        runs-on: ubuntu-latest
-        needs: test
+    train:
+      name: "Stage 2 — Automated Training"
+      runs-on: ubuntu-latest
+      needs: test
 
-        steps:
-          - name: Checkout repository
-            uses: actions/checkout@v4
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
-          - name: Setup Python
-            uses: actions/setup-python@v5
-            with:
-              python-version: "3.12"
+        - name: Setup Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.12"
 
-          - name: Cache pip
-            uses: actions/cache@v4
-            with:
-              path: ~/.cache/pip
-              key: pip-${{ hashFiles('requirements.txt') }}
-              restore-keys: pip-
+        - name: Cache pip
+          uses: actions/cache@v4
+          with:
+            path: ~/.cache/pip
+            key: pip-${{ hashFiles('requirements.txt') }}
+            restore-keys: pip-
 
-          - name: Install dependencies
-            run: pip install -r requirements.txt
+        - name: Install dependencies
+          run: pip install -r requirements.txt
 
-          - name: Cache DVC local storage
-            uses: actions/cache@v4
-            with:
-              path: .dvc/cache
-              key: dvc-cache-${{ hashFiles('data/**/*.dvc') }}
-              restore-keys: dvc-cache-
+        - name: Cache DVC local storage
+          uses: actions/cache@v4
+          with:
+            path: .dvc/cache
+            key: dvc-cache-${{ hashFiles('data/**/*.dvc') }}
+            restore-keys: dvc-cache-
 
-          - name: Pull data dari DVC local cache
+        - name: Pull data dari DVC local cache
             run: dvc checkout
 
-          - name: Run training
+        - name: Run training
             run: python src/train/train.py
 
-          - name: Upload mlruns artifact
-            uses: actions/upload-artifact@v4
-            with:
-              name: mlruns
-              path: src/train/mlruns/
-              retention-days: 7
+        - name: Upload mlruns artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: mlruns
+            path: src/train/mlruns/
+            retention-days: 7
 
     # JOB 3+4 — EVALUATION & REGISTRY
     evaluate:
