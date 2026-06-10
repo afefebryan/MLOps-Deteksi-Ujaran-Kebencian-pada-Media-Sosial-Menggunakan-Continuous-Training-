@@ -20,7 +20,7 @@ from sklearn.metrics import (
 # CONFIG
 # =========================
 DATA_PATH = "data/processed/tdavidson_hate_speech_v0_clean.csv"
-EXPERIMENT_NAME = "hate-speech-classification-ci"
+EXPERIMENT_NAME = "hate-speech-classification"
 BEST_METRIC = "f1_macro"
 
 TFIDF_PARAMS = dict(
@@ -35,7 +35,7 @@ TFIDF_PARAMS = dict(
 # =========================
 os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 MLRUNS_PATH = os.path.join(BASE_DIR, "mlruns")
 
 mlflow.set_tracking_uri(f"file:{MLRUNS_PATH}")
